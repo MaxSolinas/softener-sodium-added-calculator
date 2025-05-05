@@ -1,0 +1,69 @@
+<h2 style="text-align: center;">Calculatrice de sodium ajouté</h2>
+
+<div id="calculatrice-sodium" style="display: flex; flex-direction: column; gap: 10px; max-width: 400px; margin: 20px auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <label for="dureteBrute" style="width: 160px;">Dureté brute :</label>
+    <input type="number" id="dureteBrute" style="width: 100px;" placeholder="ex: 19">
+    <select id="uniteBrute" style="height: 30px;">
+      <option value="mgL">mg/L</option>
+      <option value="french">°f</option>
+      <option value="german">°d</option>
+    </select>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <label style="width: 160px;">Dureté résiduelle :</label>
+    <input type="text" id="residuelAffiche" value="60 mg/L" style="width: 100px; background-color: #f0f0f0; border: none;" disabled>
+  </div>
+
+  <div style="text-align: center; margin-top: 10px;">
+    <button id="calculerButton" style="background-color: #0D7EBC; color: white; border: none; padding: 8px 20px; border-radius: 5px; cursor: pointer; width: 150px;">
+      Calculer
+    </button>
+  </div>
+</div>
+
+<h3 style="text-align: center;">Résultats :</h3>
+<p id="resultat" style="text-align: center;"></p>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const COEFFICIENT_SODIUM = 0.46;
+    const DURETE_RESIDUELLE_FIXE = 60;
+
+    const dureteBruteInput = document.getElementById('dureteBrute');
+    const uniteBruteSelect = document.getElementById('uniteBrute');
+    const calculerButton = document.getElementById('calculerButton');
+    const resultat = document.getElementById('resultat');
+
+    function convertirEnMgL(valeur, unite) {
+        if (unite === 'french') return valeur * 10;
+        if (unite === 'german') return valeur * 17.8;
+        return valeur;
+    }
+
+    calculerButton.addEventListener('click', function () {
+        const dureteBrute = parseFloat(dureteBruteInput.value);
+        const uniteBrute = uniteBruteSelect.value;
+
+        if (isNaN(dureteBrute)) {
+            resultat.innerText = "Veuillez remplir correctement la dureté brute.";
+            return;
+        }
+
+        const dureteBruteMgL = convertirEnMgL(dureteBrute, uniteBrute);
+
+        if (dureteBruteMgL < DURETE_RESIDUELLE_FIXE) {
+            resultat.innerText = "La dureté brute doit être supérieure à 60 mg/L.";
+            return;
+        }
+
+        const dureteTraitee = dureteBruteMgL - DURETE_RESIDUELLE_FIXE;
+        const sodiumAjoute = dureteTraitee * COEFFICIENT_SODIUM;
+
+        resultat.innerHTML = `
+            <strong>Sodium ajouté par l'adoucisseur :</strong> ${sodiumAjoute.toFixed(2)} mg/L
+        `;
+    });
+});
+</script>
